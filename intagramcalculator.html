@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Revenue Leakage Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            color: #405DE6;
+            margin-bottom: 15px;
+            font-size: 2.8rem;
+        }
+        
+        .subtitle {
+            color: #8e8e8e;
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .calculator-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .input-section, .results-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+        }
+        
+        .section-title {
+            color: #405DE6;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            font-size: 1.8rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #262626;
+            font-size: 1.1rem;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #dbdbdb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #405DE6;
+            box-shadow: 0 0 0 3px rgba(64, 93, 230, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(45deg, #405DE6, #5851DB);
+            color: white;
+            border: none;
+            padding: 18px 28px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(64, 93, 230, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(-1px);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .cta-button {
+            background: linear-gradient(45deg, #E1306C, #F56040);
+            margin-top: 30px;
+            padding: 20px 30px;
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .cta-button:hover {
+            background: linear-gradient(45deg, #C13584, #E1306C);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(225, 48, 108, 0.4);
+        }
+        
+        .results-placeholder {
+            text-align: center;
+            color: #8e8e8e;
+            padding: 40px 0;
+            font-size: 1.1rem;
+        }
+        
+        .metric {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #efefef;
+        }
+        
+        .metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            font-size: 16px;
+            color: #8e8e8e;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .metric-label i {
+            margin-right: 10px;
+            color: #405DE6;
+        }
+        
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #262626;
+        }
+        
+        .loss-amount {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #E1306C;
+            text-align: center;
+            margin: 30px 0;
+            padding: 25px;
+            background-color: rgba(225, 48, 108, 0.05);
+            border-radius: 15px;
+            border: 2px dashed #E1306C;
+        }
+        
+        .result-comparison {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            text-align: center;
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .current, .potential {
+            flex: 1;
+            padding: 15px;
+        }
+        
+        .current {
+            color: #8e8e8e;
+        }
+        
+        .potential {
+            color: #38b440;
+            font-weight: 600;
+        }
+        
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .comparison-title {
+            font-weight: 700;
+            font-size: 18px;
+            color: #405DE6;
+            margin: 0 20px;
+        }
+        
+        .industry-tips {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            margin-top: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .industry-tips h3 {
+            margin-bottom: 25px;
+            color: #405DE6;
+            font-size: 1.8rem;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .tip {
+            margin-bottom: 18px;
+            padding-left: 25px;
+            position: relative;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .tip:before {
+            content: "•";
+            color: #E1306C;
+            font-size: 24px;
+            position: absolute;
+            left: 0;
+            top: -2px;
+        }
+        
+        .custom-industry {
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .custom-industry input {
+            border-color: #E1306C;
+        }
+        
+        .custom-industry input:focus {
+            border-color: #E1306C;
+            box-shadow: 0 0 0 3px rgba(225, 48, 108, 0.2);
+        }
+        
+        .price-note {
+            font-size: 14px;
+            color: #8e8e8e;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .platform-info {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .platform-info h3 {
+            color: #405DE6;
+            margin-bottom: 15px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .info-card h4 {
+            color: #405DE6;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-card h4 i {
+            margin-right: 10px;
+        }
+        
+        .error-message {
+            background: #fee;
+            border: 2px solid #fcc;
+            border-radius: 8px;
+            padding: 15px;
+            color: #c33;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .no-business-note {
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 15px;
+            color: #2e7d32;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: white;
+            font-size: 16px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .explanation-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+            border-left: 4px solid #405DE6;
+        }
+        
+        .explanation-box h4 {
+            color: #405DE6;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .explanation-box p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .calculator-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .input-section, .results-section {
+                padding: 20px;
+                min-width: auto;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .result-comparison {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .comparison-title {
+                margin: 10px 0;
+            }
+            
+            .loss-amount {
+                font-size: 2.2rem;
+                padding: 20px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            header {
+                padding: 15px;
+            }
+            
+            .industry-tips, .platform-info {
+                padding: 20px;
+            }
+            
+            .cta-button {
+                font-size: 16px;
+                padding: 15px 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .input-section, .results-section {
+                padding: 15px;
+            }
+            
+            input, select, button {
+                padding: 14px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            .loss-amount {
+                font-size: 1.8rem;
+                padding: 15px;
+            }
+        }
+        
+        /* Loading animation */
+        .calculating {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .calculating::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid #405DE6;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fab fa-instagram"></i> Instagram Revenue Calculator</h1>
+            <p class="subtitle">Discover how much money you could be making with better Instagram strategy</p>
+        </header>
+        
+        <div class="calculator-container">
+            <div class="input-section">
+                <h2 class="section-title">Your Account Details</h2>
+                
+                <div class="error-message" id="errorMessage"></div>
+                <div class="no-business-note" id="noBusinessNote">
+                    <i class="fas fa-info-circle"></i> No business yet? No problem! We'll show you potential earnings based on engagement and sponsorship opportunities.
+                </div>
+                
+                <div class="form-group">
+                    <label for="followerCount"><i class="fas fa-users"></i> How many followers do you have?</label>
+                    <input type="number" id="followerCount" placeholder="e.g., 5000" min="1" max="10000000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="postingFrequency"><i class="fas fa-calendar-plus"></i> How often do you post per week?</label>
+                    <input type="number" id="postingFrequency" placeholder="e.g., 3" value="3" min="1" max="30">
+                </div>
+                
+                <div class="form-group">
+                    <label for="industry"><i class="fas fa-industry"></i> What's your business type?</label>
+                    <select id="industry">
+                        <option value="fashion">Fashion & Clothing</option>
+                        <option value="food">Food & Restaurant</option>
+                        <option value="lifestyle">Lifestyle & Personal Brand</option>
+                        <option value="finance">Finance & Money</option>
+                        <option value="health">Health & Wellness</option>
+                        <option value="tech">Technology</option>
+                        <option value="creative">Creative Services</option>
+                        <option value="fitness">Fitness & Sports</option>
+                        <option value="beauty">Beauty & Cosmetics</option>
+                        <option value="travel">Travel & Tourism</option>
+                        <option value="education">Education & Coaching</option>
+                        <option value="realestate">Real Estate</option>
+                        <option value="automotive">Cars & Automotive</option>
+                        <option value="pets">Pets & Animals</option>
+                        <option value="parenting">Parenting & Family</option>
+                        <option value="gaming">Gaming & Entertainment</option>
+                        <option value="music">Music & Arts</option>
+                        <option value="photography">Photography</option>
+                        <option value="other">Other (Specify Below)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group custom-industry" id="customIndustryGroup">
+                    <label for="customIndustry"><i class="fas fa-edit"></i> Tell us your specific business</label>
+                    <input type="text" id="customIndustry" placeholder="e.g., Handmade jewelry, Local bakery, etc.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="productPrice"><i class="fas fa-tag"></i> What's your average product/service price? (KES)</label>
+                    <input type="number" id="productPrice" placeholder="Enter 0 if no business yet" value="0" min="0" max="10000000">
+                    <div class="price-note">Enter 0 if you don't have a business yet - we'll show you earning potential from sponsorships</div>
+                </div>
+                
+                <button id="calculateBtn"><i class="fas fa-calculator"></i> Show Me My Earning Potential!</button>
+            </div>
+            
+            <div class="results-section">
+                <h2 class="section-title">Your Revenue Potential</h2>
+                <div id="resultsContainer">
+                    <div class="results-placeholder">
+                        <p><i class="fas fa-chart-line"></i> Fill in your details and click the button to see how much you could be earning!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="industry-tips">
+            <h3><i class="fas fa-lightbulb"></i> Tips to Grow Your Instagram Revenue</h3>
+            <div id="tipsContainer">
+                <p>Select your business type above to see specific tips for your industry</p>
+            </div>
+        </div>
+        
+        <div class="platform-info">
+            <h3><i class="fas fa-rocket"></i> Ready to Turn This Potential Into Real Money?</h3>
+            <p>Our calculator shows what's possible - but getting there requires the right strategy. Let's talk about how to make this happen for your business.</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <button class="cta-button" onclick="window.open('https://calendly.com/trcmedia-ke/30min', '_blank')">
+                    <i class="fas fa-calendar-alt"></i> Book Your Free Strategy Call
+                </button>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4><i class="fas fa-chart-line"></i> Custom Strategy</h4>
+                    <p>We'll create a plan specifically for your business and goals</p>
+                </div>
+                
+                <div class="info-card">
+                    <h4><i class="fas fa-camera"></i> Content That Sells</h4>
+                    <p>Learn how to create posts that turn followers into paying customers</p>
+                </div>
+                
+                <div class="info-card">
+                    <h4><i class="fas fa-users"></i> Grow Real Followers</h4>
+                    <p>Get genuine followers who actually buy from you, not just likes</p>
+                </div>
+                
+                <div class="info-card">
+                    <h4><i class="fas fa-money-bill-wave"></i> Make More Money</h4>
+                    <p>Turn your Instagram into a profit-generating machine</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Results are estimates based on industry data. Your actual results will depend on your strategy and execution.</p>
+            <p>© 2025 TRC Media Kenya | Let's Grow Your Business Together</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculateBtn = document.getElementById('calculateBtn');
+            const industrySelect = document.getElementById('industry');
+            const customIndustryGroup = document.getElementById('customIndustryGroup');
+            const tipsContainer = document.getElementById('tipsContainer');
+            const errorMessage = document.getElementById('errorMessage');
+            const noBusinessNote = document.getElementById('noBusinessNote');
+            const productPriceInput = document.getElementById('productPrice');
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            // Show/hide custom industry input
+            industrySelect.addEventListener('change', function() {
+                if (this.value === 'other') {
+                    customIndustryGroup.style.display = 'block';
+                } else {
+                    customIndustryGroup.style.display = 'none';
+                }
+                updateIndustryTips(this.value);
+            });
+            
+            // Show note for no business
+            productPriceInput.addEventListener('input', function() {
+                if (parseFloat(this.value) === 0 || this.value === '') {
+                    noBusinessNote.style.display = 'block';
+                } else {
+                    noBusinessNote.style.display = 'none';
+                }
+            });
+            
+            // Simple, actionable tips for Kenyan businesses
+            const industryTips = {
+                fashion: [
+                    "Post outfit ideas showing how to style your pieces - people buy what they can imagine wearing",
+                    "Show your clothes on real people, not just flat lays - this builds trust and shows fit",
+                    "Use Instagram Shopping tags so people can buy directly from your posts",
+                    "Share behind-the-scenes content from your workshop or design process",
+                    "Partner with local influencers who match your style and target customers",
+                    "Post customer photos wearing your designs - this is free advertising and social proof"
+                ],
+                food: [
+                    "Post mouth-watering photos of your food during peak meal times (11am-1pm, 6pm-8pm)",
+                    "Share your cooking process and ingredients - people love seeing how food is made",
+                    "Post customer reviews and photos of people enjoying your food",
+                    "Use Instagram Stories to show daily specials and limited-time offers",
+                    "Partner with food delivery apps and promote special Instagram discounts",
+                    "Share the story behind your recipes - Kenyans love authentic, personal stories"
+                ],
+                lifestyle: [
+                    "Share your daily life authentically - people follow lifestyle accounts for inspiration",
+                    "Partner with brands that align with your values and lifestyle",
+                    "Create 'day in my life' content that subtly shows products you use",
+                    "Use Instagram Stories polls and questions to engage your audience",
+                    "Share tips and advice related to your lifestyle niche",
+                    "Be consistent with your posting style and brand colors"
+                ],
+                finance: [
+                    "Share simple money tips that everyday Kenyans can understand and use",
+                    "Break down complex financial concepts using local examples and scenarios",
+                    "Share your own financial journey honestly - people trust authentic stories",
+                    "Create infographics with practical budgeting and saving tips",
+                    "Partner with local financial institutions for educational content",
+                    "Address common financial challenges that Kenyans face"
+                ],
+                health: [
+                    "Share before-and-after stories (with permission) to show real results",
+                    "Post quick, practical health tips that people can implement immediately",
+                    "Use Instagram Live for Q&A sessions about health topics",
+                    "Share educational content about common health issues",
+                    "Partner with other health professionals for cross-referrals",
+                    "Post client testimonials and success stories regularly"
+                ],
+                tech: [
+                    "Create simple tutorials showing how your product solves real problems",
+                    "Share customer success stories with specific results and numbers",
+                    "Explain complex tech concepts using simple, everyday language",
+                    "Show your product in action through video demonstrations",
+                    "Partner with business influencers who can vouch for your solutions",
+                    "Share industry insights and trends that affect your customers"
+                ],
+                creative: [
+                    "Show your creative process from start to finish - people love seeing the journey",
+                    "Post before-and-after transformations of your work",
+                    "Share client testimonials with photos of completed projects",
+                    "Offer quick tips and tutorials related to your creative field",
+                    "Partner with other creatives for collaboration opportunities",
+                    "Use time-lapse videos to showcase your skills and process"
+                ],
+                fitness: [
+                    "Post workout videos with clear instructions for proper form",
+                    "Share client transformation photos and success stories",
+                    "Provide nutrition tips and simple, healthy meal ideas",
+                    "Use Instagram Stories for daily motivation and quick tips",
+                    "Create fitness challenges that engage your community",
+                    "Partner with local gyms and fitness brands for cross-promotion"
+                ],
+                beauty: [
+                    "Create step-by-step makeup tutorials using products you sell or recommend",
+                    "Share before-and-after photos of your work (with client permission)",
+                    "Post honest reviews of beauty products your audience would use",
+                    "Use Instagram Stories for quick beauty tips and product demos",
+                    "Partner with beauty influencers and other makeup artists",
+                    "Share seasonal beauty looks and trending styles"
+                ],
+                travel: [
+                    "Share stunning photos from local Kenyan destinations to inspire local travel",
+                    "Create detailed travel guides with budget breakdowns",
+                    "Post behind-the-scenes content from your travels",
+                    "Use Instagram Stories highlights to organize different destinations",
+                    "Partner with local hotels, tour operators, and airlines",
+                    "Share practical travel tips and money-saving strategies"
+                ],
+                education: [
+                    "Share bite-sized lessons that provide immediate value to your audience",
+                    "Create carousel posts that break down complex topics into simple steps",
+                    "Use Instagram Live for teaching sessions and Q&A",
+                    "Post success stories from your students or clients",
+                    "Share free resources and worksheets to attract potential students",
+                    "Partner with other educators for joint workshops and cross-promotion"
+                ],
+                realestate: [
+                    "Showcase properties with high-quality photos and virtual tours",
+                    "Share market insights and trends affecting Kenyan real estate",
+                    "Post client testimonials and successful transaction stories",
+                    "Create educational content about the buying and selling process",
+                    "Use Instagram Stories for real-time property updates and open houses",
+                    "Build trust by sharing your local area expertise and community involvement"
+                ],
+                automotive: [
+                    "Share detailed car reviews with honest pros and cons",
+                    "Post maintenance tips and automotive education content",
+                    "Showcase before-and-after restoration or repair work",
+                    "Create video content of car tests and demonstrations",
+                    "Share industry news and trends affecting car buyers",
+                    "Build community through car meet-ups and local automotive events"
+                ],
+                pets: [
+                    "Share adorable pet photos and videos that make people smile",
+                    "Post practical pet care tips and training advice",
+                    "Create educational content about different breeds and pet health",
+                    "Share transformation stories of pets you've helped (grooming, training)",
+                    "Use user-generated content from happy pet owners",
+                    "Partner with local veterinarians and pet supply stores"
+                ],
+                parenting: [
+                    "Share authentic parenting moments that other parents can relate to",
+                    "Post practical parenting tips and child development advice",
+                    "Review family-friendly products honestly",
+                    "Share fun family activities and educational games",
+                    "Build community by engaging with other parents' content",
+                    "Partner with family brands and educational toy companies"
+                ],
+                gaming: [
+                    "Share gameplay highlights, tips, and strategy guides",
+                    "Create gaming setup tours and equipment reviews",
+                    "Post about new game releases and honest reviews",
+                    "Use Instagram Stories for real-time gaming updates",
+                    "Build community through gaming challenges and local tournaments",
+                    "Partner with gaming brands and tech companies for product reviews"
+                ],
+                music: [
+                    "Share behind-the-scenes content from recording sessions and performances",
+                    "Post snippets of new music and works in progress",
+                    "Create educational content about music and your creative process",
+                    "Share your musical journey and the story behind your songs",
+                    "Use Instagram Stories for real-time performance and studio updates",
+                    "Collaborate with other local musicians and music industry professionals"
+                ],
+                photography: [
+                    "Share your best work with the story behind each shot",
+                    "Create photography tutorials and tips for aspiring photographers",
+                    "Post client session highlights with their permission",
+                    "Review photography equipment and share honest recommendations",
+                    "Show before-and-after editing examples to demonstrate your skills",
+                    "Build community through photography challenges and features"
+                ],
+                other: [
+                    "Post consistently when your audience is most active on Instagram",
+                    "Use a mix of photos, videos, carousels, and Stories to keep content fresh",
+                    "Engage with your audience by responding to comments and DMs quickly",
+                    "Research hashtags that your target customers actually use",
+                    "Partner with complementary businesses for mutual promotion",
+                    "Track your results and focus on what works for your specific audience"
+                ]
+            };
+            
+            // Industry benchmarks for Kenyan market
+            const industryBenchmarks = {
+                fashion: { engagementMultiplier: 1.1, conversionRate: 0.06, sponsorshipRate: 0.012 },
+                food: { engagementMultiplier: 1.4, conversionRate: 0.08, sponsorshipRate: 0.018 },
+                lifestyle: { engagementMultiplier: 1.2, conversionRate: 0.04, sponsorshipRate: 0.020 },
+                finance: { engagementMultiplier: 0.8, conversionRate: 0.15, sponsorshipRate: 0.010 },
+                health: { engagementMultiplier: 0.9, conversionRate: 0.10, sponsorshipRate: 0.015 },
+                tech: { engagementMultiplier: 0.7, conversionRate: 0.12, sponsorshipRate: 0.008 },
+                creative: { engagementMultiplier: 1.0, conversionRate: 0.08, sponsorshipRate: 0.014 },
+                fitness: { engagementMultiplier: 1.3, conversionRate: 0.07, sponsorshipRate: 0.016 },
+                beauty: { engagementMultiplier: 1.5, conversionRate: 0.05, sponsorshipRate: 0.022 },
+                travel: { engagementMultiplier: 1.1, conversionRate: 0.04, sponsorshipRate: 0.018 },
+                education: { engagementMultiplier: 0.9, conversionRate: 0.12, sponsorshipRate: 0.012 },
+                realestate: { engagementMultiplier: 0.6, conversionRate: 0.18, sponsorshipRate: 0.006 },
+                automotive: { engagementMultiplier: 0.8, conversionRate: 0.10, sponsorshipRate: 0.012 },
+                pets: { engagementMultiplier: 1.6, conversionRate: 0.05, sponsorshipRate: 0.016 },
+                parenting: { engagementMultiplier: 1.1, conversionRate: 0.06, sponsorshipRate: 0.014 },
+                gaming: { engagementMultiplier: 1.4, conversionRate: 0.05, sponsorshipRate: 0.020 },
+                music: { engagementMultiplier: 1.3, conversionRate: 0.04, sponsorshipRate: 0.018 },
+                photography: { engagementMultiplier: 1.0, conversionRate: 0.09, sponsorshipRate: 0.013 },
+                other: { engagementMultiplier: 1.0, conversionRate: 0.06, sponsorshipRate: 0.012 }
+            };
+            
+            // Initialize with default tips
+            updateIndustryTips('fashion');
+            
+            function updateIndustryTips(industry) {
+                const tips = industryTips[industry] || industryTips.other;
+                tipsContainer.innerHTML = '';
+                
+                tips.forEach(tip => {
+                    const tipElement = document.createElement('div');
+                    tipElement.className = 'tip';
+                    tipElement.textContent = tip;
+                    tipsContainer.appendChild(tipElement);
+                });
+            }
+            
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('en-KE', {
+                    style: 'currency',
+                    currency: 'KES',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(amount);
+            }
+            
+            function formatNumber(num) {
+                if (num >= 1000000) {
+                    return (num / 1000000).toFixed(1) + 'M';
+                } else if (num >= 1000) {
+                    return (num / 1000).toFixed(1) + 'K';
+                } else {
+                    return num.toString();
+                }
+            }
+            
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 5000);
+            }
+            
+            function validateInputs() {
+                const followers = parseInt(document.getElementById('followerCount').value);
+                const postingFreq = parseInt(document.getElementById('postingFrequency').value);
+                const price = parseFloat(document.getElementById('productPrice').value);
+                
+                if (!followers || followers < 1) {
+                    showError('Please enter a valid follower count (at least 1)');
+                    return false;
+                }
+                
+                if (followers > 10000000) {
+                    showError('Follower count seems too high. Please enter a realistic number.');
+                    return false;
+                }
+                
+                if (!postingFreq || postingFreq < 1 || postingFreq > 30) {
+                    showError('Please enter a valid posting frequency (1-30 posts per week)');
+                    return false;
+                }
+                
+                if (price < 0) {
+                    showError('Product price cannot be negative');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            function calculateRevenue() {
+                if (!validateInputs()) return;
+                
+                // Show loading state
+                calculateBtn.disabled = true;
+                calculateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
+                resultsContainer.classList.add('calculating');
+                
+                setTimeout(() => {
+                    const followers = parseInt(document.getElementById('followerCount').value);
+                    const postingFreq = parseInt(document.getElementById('postingFrequency').value);
+                    const price = parseFloat(document.getElementById('productPrice').value) || 0;
+                    const industry = document.getElementById('industry').value;
+                    
+                    const benchmark = industryBenchmarks[industry] || industryBenchmarks.other;
+                    
+                    // Calculate engagement metrics
+                    const avgEngagementRate = Math.max(0.02, Math.min(0.08, 0.05 * (10000 / Math.max(followers, 1000)))) * benchmark.engagementMultiplier;
+                    const monthlyPosts = postingFreq * 4.33; // Average weeks per month
+                    const monthlyEngagements = followers * avgEngagementRate * monthlyPosts;
+                    
+                    // Calculate different revenue streams
+                    let productRevenue = 0;
+                    let sponsorshipRevenue = 0;
+                    
+                    if (price > 0) {
+                        // Product sales revenue
+                        const monthlyConversions = monthlyEngagements * benchmark.conversionRate;
+                        productRevenue = monthlyConversions * price;
+                    }
+                    
+                    // Sponsorship revenue (always calculated)
+                    const sponsorshipPerPost = followers * benchmark.sponsorshipRate;
+                    sponsorshipRevenue = sponsorshipPerPost * monthlyPosts;
+                    
+                    // Current vs potential comparison
+                    const currentRevenue = productRevenue * 0.3; // Assume they're at 30% of potential
+                    const potentialRevenue = productRevenue + sponsorshipRevenue;
+                    const revenueGap = potentialRevenue - currentRevenue;
+                    
+                    displayResults({
+                        followers,
+                        avgEngagementRate,
+                        monthlyEngagements,
+                        currentRevenue,
+                        potentialRevenue,
+                        revenueGap,
+                        productRevenue,
+                        sponsorshipRevenue,
+                        monthlyPosts,
+                        industry,
+                        price
+                    });
+                    
+                    // Reset button state
+                    calculateBtn.disabled = false;
+                    calculateBtn.innerHTML = '<i class="fas fa-calculator"></i> Show Me My Earning Potential!';
+                    resultsContainer.classList.remove('calculating');
+                }, 1500); // Add some delay for better UX
+            }
+            
+            function displayResults(data) {
+                const isNoBusiness = data.price === 0;
+                
+                let resultsHTML = `
+                    <div class="metric">
+                        <div class="metric-label">
+                            <i class="fas fa-users"></i> Your Audience Reach
+                        </div>
+                        <div class="metric-value">${formatNumber(data.followers)} followers</div>
+                    </div>
+                    
+                    <div class="metric">
+                        <div class="metric-label">
+                            <i class="fas fa-heart"></i> Monthly Engagement
+                        </div>
+                        <div class="metric-value">${formatNumber(Math.round(data.monthlyEngagements))}</div>
+                    </div>
+                `;
+                
+                if (isNoBusiness) {
+                    // Show sponsorship potential only
+                    resultsHTML += `
+                        <div class="loss-amount">
+                            ${formatCurrency(data.sponsorshipRevenue)}/month
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h4>Your Sponsorship Earning Potential</h4>
+                            <p>Even without a business, you could earn <strong>${formatCurrency(data.sponsorshipRevenue)} per month</strong> from sponsored posts and brand partnerships!</p>
+                            <p>With ${data.monthlyPosts.toFixed(0)} posts per month, you could charge approximately <strong>${formatCurrency(data.sponsorshipRevenue / data.monthlyPosts)}</strong> per sponsored post.</p>
+                        </div>
+                        
+                        <div class="metric">
+                            <div class="metric-label">
+                                <i class="fas fa-handshake"></i> Potential Brand Partnerships
+                            </div>
+                            <div class="metric-value">${formatCurrency(data.sponsorshipRevenue)}/month</div>
+                        </div>
+                    `;
+                } else {
+                    // Show full revenue analysis
+                    resultsHTML += `
+                        <div class="result-comparison">
+                            <div class="current">
+                                <div class="result-title">Current Monthly Revenue</div>
+                                <div style="font-size: 24px; font-weight: bold;">${formatCurrency(data.currentRevenue)}</div>
+                            </div>
+                            <div class="comparison-title">VS</div>
+                            <div class="potential">
+                                <div class="result-title">Full Potential</div>
+                                <div style="font-size: 24px; font-weight: bold;">${formatCurrency(data.potentialRevenue)}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="loss-amount">
+                            You're missing ${formatCurrency(data.revenueGap)}/month
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h4>How We Calculated This</h4>
+                            <p><strong>Product Sales:</strong> ${formatCurrency(data.productRevenue)}/month based on your ${formatCurrency(data.price)} average price and ${(data.avgEngagementRate * 100).toFixed(1)}% engagement rate.</p>
+                            <p><strong>Sponsorships:</strong> ${formatCurrency(data.sponsorshipRevenue)}/month from brand partnerships (${formatCurrency(data.sponsorshipRevenue / data.monthlyPosts)}/post).</p>
+                            <p><strong>Current Performance:</strong> We estimate you're capturing about 30% of your potential revenue right now.</p>
+                        </div>
+                        
+                        <div class="metric">
+                            <div class="metric-label">
+                                <i class="fas fa-shopping-cart"></i> Monthly Product Sales Potential
+                            </div>
+                            <div class="metric-value">${formatCurrency(data.productRevenue)}</div>
+                        </div>
+                        
+                        <div class="metric">
+                            <div class="metric-label">
+                                <i class="fas fa-handshake"></i> Monthly Sponsorship Potential
+                            </div>
+                            <div class="metric-value">${formatCurrency(data.sponsorshipRevenue)}</div>
+                        </div>
+                    `;
+                }
+                
+                // Add yearly projection
+                const yearlyPotential = isNoBusiness ? data.sponsorshipRevenue * 12 : data.potentialRevenue * 12;
+                resultsHTML += `
+                    <div class="metric">
+                        <div class="metric-label">
+                            <i class="fas fa-calendar-alt"></i> Yearly Potential
+                        </div>
+                        <div class="metric-value">${formatCurrency(yearlyPotential)}</div>
+                    </div>
+                `;
+                
+                resultsContainer.innerHTML = resultsHTML;
+                
+                // Scroll to results on mobile
+                if (window.innerWidth <= 768) {
+                    resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+            
+            // Event listeners
+            calculateBtn.addEventListener('click', calculateRevenue);
+            
+            // Allow Enter key to trigger calculation
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !calculateBtn.disabled) {
+                    calculateRevenue();
+                }
+            });
+            
+            // Auto-format number inputs
+            document.getElementById('followerCount').addEventListener('input', function() {
+                // Remove any non-numeric characters
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+            
+            document.getElementById('productPrice').addEventListener('input', function() {
+                // Remove any non-numeric characters except decimal point
+                this.value = this.value.replace(/[^0-9.]/g, '');
+                
+                // Ensure only one decimal point
+                const parts = this.value.split('.');
+                if (parts.length > 2) {
+                    this.value = parts[0] + '.' + parts.slice(1).join('');
+                }
+            });
+            
+            // Prevent form submission on Enter (which could cause page reload)
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        calculateRevenue();
+                    }
+                });
+            });
+            
+            // Initialize default state
+            noBusinessNote.style.display = 'block'; // Show since default price is 0
+        });
+    </script>
+</body>
+</html>
